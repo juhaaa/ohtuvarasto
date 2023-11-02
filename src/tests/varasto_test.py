@@ -6,6 +6,14 @@ class TestVarasto(unittest.TestCase):
     def setUp(self):
         self.varasto = Varasto(10)
 
+    def test_konstruktorille_negatiivinen_tilavuus(self):
+        self.neg_varasto = Varasto(-10)
+        self.assertAlmostEqual(self.neg_varasto.tilavuus, 0)
+
+    def test_kostruktorille_neg_alkusaldo(self):
+        self.neg_saldo_varasto = Varasto(10, -10)
+        self.assertAlmostEqual(self.neg_saldo_varasto.saldo, 0)
+
     def test_konstruktori_luo_tyhjan_varaston(self):
         # https://docs.python.org/3/library/unittest.html#unittest.TestCase.assertAlmostEqual
         self.assertAlmostEqual(self.varasto.saldo, 0)
@@ -38,3 +46,42 @@ class TestVarasto(unittest.TestCase):
 
         # varastossa pitäisi olla tilaa 10 - 8 + 2 eli 4
         self.assertAlmostEqual(self.varasto.paljonko_mahtuu(), 4)
+
+    def test_lisaa_negatiivinen_maara(self):
+        self.varasto.lisaa_varastoon(-10)
+
+        # vapaata tilaa ennen lisäystä 10, ei pitäisi muuttua
+        self.assertAlmostEqual(self.varasto.paljonko_mahtuu(), 10)
+
+    def test_lisaa_enemman_kuin_varastossa_tilaa(self):
+        self.varasto.lisaa_varastoon(11)
+
+        # yritetään lisätä 11, vaikka mahtuu vain 10.
+        self.assertAlmostEqual(self.varasto.saldo, 10)
+
+    def test_otetaan_negatiivinen_maara(self):
+        self.varasto.lisaa_varastoon(5)
+        self.varasto.ota_varastosta(-2)
+
+        # lisätään 5, otetaan -2. Saldon ei pitäisi muuttua.
+        self.assertAlmostEqual(self.varasto.saldo, 5)
+
+    def test_otetaan_enemmän_kuin_saldo(self):
+        self.varasto.lisaa_varastoon(5)
+        otto = self.varasto.ota_varastosta(6)
+
+        #otetaan 6, varaston saldo 5, saadaan 5
+        self.assertAlmostEqual(otto, 5)
+
+    def test_varaston_saldo_ei_neg_kun_otetaan_yli_saldon(self):
+
+        self.varasto.lisaa_varastoon(5)
+        self.varasto.ota_varastosta(6)
+
+        #otetaan 6, varaston saldo 5 -> varaston saldo 0
+        self.assertAlmostEqual(self.varasto.saldo, 0)
+
+    def test_tulostus(self):
+        self.assertEqual(str(self.varasto), "saldo = 0, vielä tilaa 10")
+        
+
